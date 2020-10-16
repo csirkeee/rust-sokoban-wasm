@@ -1,7 +1,9 @@
 use crate::audio::AudioStore;
 use crate::events::Event;
 use ggez::event::KeyCode;
+use ggez::graphics::Image;
 use specs::World;
+use std::collections::HashMap;
 use std::fmt;
 use std::{fmt::Display, time::Duration};
 
@@ -9,14 +11,6 @@ use std::{fmt::Display, time::Duration};
 #[derive(Default)]
 pub struct InputQueue {
     pub keys_pressed: Vec<KeyCode>,
-}
-
-pub fn register_resources(world: &mut World) {
-    world.insert(InputQueue::default());
-    world.insert(Gameplay::default());
-    world.insert(Time::default());
-    world.insert(EventQueue::default());
-    world.insert(AudioStore::default());
 }
 
 pub enum GameplayState {
@@ -54,4 +48,18 @@ pub struct Time {
 #[derive(Default)]
 pub struct EventQueue {
     pub events: Vec<Event>,
+}
+
+#[derive(Default)]
+pub struct ImageStore {
+    pub images: HashMap<String, Image>,
+}
+
+pub fn register_resources(world: &mut World) {
+    world.insert(InputQueue::default());
+    world.insert(Gameplay::default());
+    world.insert(Time::default());
+    world.insert(EventQueue::default());
+    world.insert(AudioStore::default());
+    world.insert(ImageStore::default());
 }

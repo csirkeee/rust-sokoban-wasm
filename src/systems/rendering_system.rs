@@ -9,7 +9,7 @@ use ggez::nalgebra as na;
 use ggez::{timer, Context};
 use graphics::spritebatch::SpriteBatch;
 use itertools::Itertools;
-use specs::{Join, Read, ReadStorage, System};
+use specs::{Join, Read, ReadStorage, System, Write};
 use std::{collections::HashMap, time::Duration};
 
 pub struct RenderingSystem<'a> {
@@ -59,12 +59,13 @@ impl<'a> System<'a> for RenderingSystem<'a> {
     type SystemData = (
         Read<'a, Gameplay>,
         Read<'a, Time>,
+        Write<'a, ImageStore>,
         ReadStorage<'a, Position>,
         ReadStorage<'a, Renderable>,
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (gameplay, time, positions, renderables) = data;
+        let (gameplay, time, mut image_store, positions, renderables) = data;
 
         // Clearing the screen (this gives us the backround colour)
         graphics::clear(self.context, graphics::Color::new(0.95, 0.95, 0.95, 1.0));
@@ -99,7 +100,14 @@ impl<'a> System<'a> for RenderingSystem<'a> {
             .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
         {
             for (image_path, draw_params) in group {
-                let image = Image::new(self.context, image_path).expect("expected image");
+                let image = match image_store.images.get(image_path) {
+                    Some(image) => image.clone(),
+                    _ => {
+                        let new_image = Image::new(self.context, image_path).expect("expected image");
+                        image_store.images.insert(image_path.clone(), new_image.clone());
+                        new_image
+                    },
+                };
                 let mut sprite_batch = SpriteBatch::new(image);
 
                 for draw_param in draw_params.iter() {
