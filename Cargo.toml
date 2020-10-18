@@ -7,6 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ggez = "0.5.1"
+macroquad = "0.2.9"
 specs = { version = "0.16.1", features = ["specs-derive"] }
 itertools = "0.9.0"
+futures = "0.3.6"

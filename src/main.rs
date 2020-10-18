@@ -1,9 +1,5 @@
-use ggez;
-use ggez::event::KeyCode;
-use ggez::event::KeyMods;
-use ggez::{conf, event, timer, Context, GameResult};
+use macroquad::{get_time, next_frame};
 use specs::{RunNow, World, WorldExt};
-use std::path;
 
 mod audio;
 mod components;
@@ -24,8 +20,8 @@ struct Game {
     world: World,
 }
 
-impl event::EventHandler for Game {
-    fn update(&mut self, context: &mut Context) -> GameResult {
+impl Game {
+    fn update(&mut self) {
         // Run input system
         {
             let mut is = InputSystem {};
@@ -41,7 +37,7 @@ impl event::EventHandler for Game {
         // Get and update time resource
         {
             let mut time = self.world.write_resource::<Time>();
-            time.delta += timer::delta(context);
+            time.delta = get_time();
         }
 
         // Run event system
@@ -50,30 +46,11 @@ impl event::EventHandler for Game {
             es.run_now(&self.world);
         }
 
-        Ok(())
-    }
-
-    fn draw(&mut self, context: &mut Context) -> GameResult {
         // Render game entities
         {
-            let mut rs = RenderingSystem { context };
+            let mut rs = RenderingSystem {};
             rs.run_now(&self.world);
         }
-
-        Ok(())
-    }
-
-    fn key_down_event(
-        &mut self,
-        _context: &mut Context,
-        keycode: KeyCode,
-        _keymod: KeyMods,
-        _repeat: bool,
-    ) {
-        println!("Key pressed: {:?}", keycode);
-
-        let mut input_queue = self.world.write_resource::<InputQueue>();
-        input_queue.keys_pressed.push(keycode);
     }
 }
 
@@ -94,23 +71,29 @@ pub fn initialize_level(world: &mut World) {
     load_map(world, MAP.to_string());
 }
 
-pub fn main() -> GameResult {
+#[macroquad::main("Sokoban")]
+async fn main() {
     let mut world = World::new();
     register_components(&mut world);
     register_resources(&mut world);
     initialize_level(&mut world);
 
-    // Create a game context and event loop
-    let context_builder = ggez::ContextBuilder::new("rust_sokoban", "sokoban")
-        .window_setup(conf::WindowSetup::default().title("Rust Sokoban!"))
-        .window_mode(conf::WindowMode::default().dimensions(800.0, 600.0))
-        .add_resource_path(path::PathBuf::from("./resources"));
-
-    let (context, event_loop) = &mut context_builder.build()?;
-    initialize_sounds(&mut world, context);
+    // // Create a game context and event loop
+    // let context_builder = ggez::ContextBuilder::new("rust_sokoban", "sokoban")
+    //     .window_setup(conf::WindowSetup::default().title("Rust Sokoban!"))
+    //     .window_mode(conf::WindowMode::default().dimensions(800.0, 600.0))
+    //     .add_resource_path(path::PathBuf::from("./resources"));
+    //
+    // let (context, event_loop) = &mut context_builder.build()?;
+    // initialize_sounds(&mut world, context);
 
     // Create the game state
     let game = &mut Game { world };
+
     // Run the main event loop
-    event::run(context, event_loop, game)
+    loop {
+        game.update();
+
+        next_frame().await
+    }
 }

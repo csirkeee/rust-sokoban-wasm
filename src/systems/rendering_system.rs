@@ -1,39 +1,22 @@
 use crate::components::*;
 use crate::constants::TILE_WIDTH;
 use crate::resources::*;
-use ggez::graphics;
-use ggez::graphics::Color;
-use ggez::graphics::DrawParam;
-use ggez::graphics::Image;
-use ggez::nalgebra as na;
-use ggez::{timer, Context};
-use graphics::spritebatch::SpriteBatch;
+use futures::executor::block_on;
 use itertools::Itertools;
+use macroquad::{
+    clear_background, draw_text, draw_texture, load_texture, Color, BLACK, WHITE,
+};
 use specs::{Join, Read, ReadStorage, System, Write};
-use std::{collections::HashMap, time::Duration};
+use std::{collections::HashMap};
 
-pub struct RenderingSystem<'a> {
-    pub context: &'a mut Context,
-}
+pub struct RenderingSystem {}
 
-impl RenderingSystem<'_> {
+impl RenderingSystem {
     pub fn draw_text(&mut self, text_string: &str, x: f32, y: f32) {
-        let text = graphics::Text::new(text_string);
-        let destination = na::Point2::new(x, y);
-        let color = Some(Color::new(0.0, 0.0, 0.0, 1.0));
-        let dimensions = na::Point2::new(0.0, 20.0);
-
-        graphics::queue_text(self.context, &text, dimensions, color);
-        graphics::draw_queued_text(
-            self.context,
-            graphics::DrawParam::new().dest(destination),
-            None,
-            graphics::FilterMode::Linear,
-        )
-        .expect("expected drawing queued text");
+        draw_text(text_string, x, y, 20., BLACK);
     }
 
-    pub fn get_image(&mut self, renderable: &Renderable, delta: Duration) -> String {
+    pub fn get_image(&mut self, renderable: &Renderable, delta: f64) -> String {
         let path_index = match renderable.kind() {
             RenderableKind::Static => {
                 // We only have one image, so we just return that
@@ -45,7 +28,7 @@ impl RenderingSystem<'_> {
                 // only and finally we divide by 250 to get a number between 0 and 4. If it's 4
                 // we technically are on the next iteration of the loop (or on 0), but we will let
                 // the renderable handle this logic of wrapping frames.
-                ((delta.as_millis() % 1000) / 250) as usize
+                ((delta / 0.25) as usize) % 4
             }
         };
 
@@ -54,7 +37,7 @@ impl RenderingSystem<'_> {
 }
 
 // System implementation
-impl<'a> System<'a> for RenderingSystem<'a> {
+impl<'a> System<'a> for RenderingSystem {
     // Data
     type SystemData = (
         Read<'a, Gameplay>,
@@ -68,11 +51,11 @@ impl<'a> System<'a> for RenderingSystem<'a> {
         let (gameplay, time, mut image_store, positions, renderables) = data;
 
         // Clearing the screen (this gives us the backround colour)
-        graphics::clear(self.context, graphics::Color::new(0.95, 0.95, 0.95, 1.0));
+        clear_background(Color::new(0.95, 0.95, 0.95, 1.0));
 
         // Get all the renderables with their positions.
         let rendering_data = (&positions, &renderables).join().collect::<Vec<_>>();
-        let mut rendering_batches: HashMap<u8, HashMap<String, Vec<DrawParam>>> = HashMap::new();
+        let mut rendering_batches: HashMap<u8, HashMap<String, Vec<(f32, f32)>>> = HashMap::new();
 
         // Iterate each of the renderables, determine which image path should be rendered
         // at which drawparams, and then add that to the rendering_batches.
@@ -85,13 +68,12 @@ impl<'a> System<'a> for RenderingSystem<'a> {
             let z = position.z;
 
             // Add to rendering batches
-            let draw_param = DrawParam::new().dest(na::Point2::new(x, y));
             rendering_batches
                 .entry(z)
                 .or_default()
                 .entry(image_path)
                 .or_default()
-                .push(draw_param);
+                .push((x, y));
         }
 
         // Iterate spritebatches ordered by z and actually render each of them
@@ -103,30 +85,24 @@ impl<'a> System<'a> for RenderingSystem<'a> {
                 let image = match image_store.images.get(image_path) {
                     Some(image) => image.clone(),
                     _ => {
-                        let new_image = Image::new(self.context, image_path).expect("expected image");
-                        image_store.images.insert(image_path.clone(), new_image.clone());
+                        let new_image = block_on(load_texture(image_path));
+                        image_store
+                            .images
+                            .insert(image_path.clone(), new_image.clone());
                         new_image
-                    },
+                    }
                 };
-                let mut sprite_batch = SpriteBatch::new(image);
 
-                for draw_param in draw_params.iter() {
-                    sprite_batch.add(*draw_param);
+                for (x, y) in draw_params.iter() {
+                    draw_texture(image, *x, *y, WHITE)
                 }
-
-                graphics::draw(self.context, &sprite_batch, graphics::DrawParam::new())
-                    .expect("expected render");
             }
         }
 
         // Render any text
         self.draw_text(&gameplay.state.to_string(), 525.0, 80.0);
         self.draw_text(&gameplay.moves_count.to_string(), 525.0, 100.0);
-        let fps = format!("FPS: {:.0}", timer::fps(self.context));
+        let fps = format!("Time: {:.0}", time.delta);
         self.draw_text(&fps, 525.0, 120.0);
-
-        // Finally, present the context, this will actually display everything
-        // on the screen.
-        graphics::present(self.context).expect("expected to present");
     }
 }
