@@ -1,4 +1,4 @@
-use macroquad::{get_time, next_frame};
+use macroquad::{get_time, next_frame, load_texture};
 use specs::{RunNow, World, WorldExt};
 
 mod audio;
@@ -15,6 +15,8 @@ use crate::components::*;
 use crate::map::*;
 use crate::resources::*;
 use crate::systems::*;
+use specs::shred::FetchMut;
+use std::ops::DerefMut;
 
 struct Game {
     world: World,
@@ -54,8 +56,16 @@ impl Game {
     }
 }
 
+async fn load_game_image(mut image_store: FetchMut<'_, ImageStore>, path: &str) {
+    let ref mut image_map = image_store.images;
+    if !image_map.contains_key(path) {
+        image_map.insert(path.to_string(), load_texture(path).await);
+    }
+}
+
+
 // Initialize the level
-pub fn initialize_level(world: &mut World) {
+pub async fn initialize_level(world: &mut World) {
     const MAP: &str = "
     N N W W W W W W
     W W W . . . . W
@@ -68,6 +78,18 @@ pub fn initialize_level(world: &mut World) {
     W W W W W W W W
     ";
 
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_blue_1.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_blue_2.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_red_1.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_red_2.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_spot_blue.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_spot_red.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/floor.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_1.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_2.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_3.png").await;
+    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/wall.png").await;
+
     load_map(world, MAP.to_string());
 }
 
@@ -76,7 +98,7 @@ async fn main() {
     let mut world = World::new();
     register_components(&mut world);
     register_resources(&mut world);
-    initialize_level(&mut world);
+    initialize_level(&mut world).await;
 
     // // Create a game context and event loop
     // let context_builder = ggez::ContextBuilder::new("rust_sokoban", "sokoban")

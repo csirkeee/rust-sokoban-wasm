@@ -1,7 +1,6 @@
 use crate::components::*;
 use crate::constants::TILE_WIDTH;
 use crate::resources::*;
-use futures::executor::block_on;
 use itertools::Itertools;
 use macroquad::{
     clear_background, draw_text, draw_texture, load_texture, Color, BLACK, WHITE,
@@ -82,16 +81,7 @@ impl<'a> System<'a> for RenderingSystem {
             .sorted_by(|a, b| Ord::cmp(&a.0, &b.0))
         {
             for (image_path, draw_params) in group {
-                let image = match image_store.images.get(image_path) {
-                    Some(image) => image.clone(),
-                    _ => {
-                        let new_image = block_on(load_texture(image_path));
-                        image_store
-                            .images
-                            .insert(image_path.clone(), new_image.clone());
-                        new_image
-                    }
-                };
+                let &image = image_store.images.get(image_path).unwrap();
 
                 for (x, y) in draw_params.iter() {
                     draw_texture(image, *x, *y, WHITE)
