@@ -92,7 +92,7 @@ impl<'a> System<'a> for RenderingSystem {
         // Render any text
         self.draw_text(&gameplay.state.to_string(), 525.0, 80.0);
         self.draw_text(&gameplay.moves_count.to_string(), 525.0, 100.0);
-        let fps = format!("Time: {:.0}", time.delta);
+        let fps = format!("FPS: {:}", time.frame_times.len());
         self.draw_text(&fps, 525.0, 120.0);
     }
 }

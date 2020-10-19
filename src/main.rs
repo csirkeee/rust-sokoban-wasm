@@ -39,7 +39,12 @@ impl Game {
         // Get and update time resource
         {
             let mut time = self.world.write_resource::<Time>();
-            time.delta = get_time();
+            let delta = get_time();
+            time.delta = delta;
+            time.frame_times.push_back(delta);
+            while *time.frame_times.front().unwrap() < delta - 1. {
+                time.frame_times.pop_front();
+            }
         }
 
         // Run event system

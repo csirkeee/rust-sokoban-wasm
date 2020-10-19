@@ -2,7 +2,7 @@ use crate::audio::AudioStore;
 use crate::events::Event;
 use macroquad::{Texture2D};
 use specs::World;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
 use std::fmt;
 use std::fmt::Display;
 
@@ -37,6 +37,7 @@ pub struct Gameplay {
 #[derive(Default)]
 pub struct Time {
     pub delta: f64,
+    pub frame_times: VecDeque<f64>,
 }
 
 #[derive(Default)]
