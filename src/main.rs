@@ -114,7 +114,7 @@ async fn main() {
     //     .add_resource_path(path::PathBuf::from("./resources"));
     //
     // let (context, event_loop) = &mut context_builder.build()?;
-    // initialize_sounds(&mut world, context);
+    initialize_sounds(&mut world).await;
 
     // Create the game state
     let game = &mut Game { world };

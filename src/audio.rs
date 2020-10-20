@@ -1,9 +1,12 @@
 use specs::{World, WorldExt};
 use std::collections::HashMap;
+use quad_snd::mixer::Sound;
+use macroquad::file::load_file;
+use quad_snd::decoder::read_wav;
 
 #[derive(Default)]
 pub struct AudioStore {
-    pub sounds: HashMap<String, String>,
+    pub sounds: HashMap<String, Sound>,
 }
 
 impl AudioStore {
@@ -16,15 +19,15 @@ impl AudioStore {
     }
 }
 
-pub fn initialize_sounds(world: &mut World) {
-    // let mut audio_store = world.write_resource::<AudioStore>();
-    // let sounds = ["correct", "incorrect", "wall"];
-    //
-    // for sound in sounds.iter() {
-    //     let sound_name = sound.to_string();
-    //     let sound_path = format!("/sounds/{}.wav", sound_name);
-    //     let sound_source = audio::Source::new(context, sound_path).expect("expected sound loaded");
-    //
-    //     audio_store.sounds.insert(sound_name, sound_source);
-    // }
+pub async fn initialize_sounds(world: &mut World) {
+    let mut audio_store = world.write_resource::<AudioStore>();
+    let sounds = ["correct", "incorrect", "wall"];
+
+    for sound in sounds.iter() {
+        let sound_name = sound.to_string();
+        let sound_path = format!("resources/sounds/{}.wav", sound_name);
+        let sound_bytes = load_file(&sound_path).await.unwrap();
+
+        audio_store.sounds.insert(sound_name, read_wav(&sound_bytes[..]).unwrap());
+    }
 }
