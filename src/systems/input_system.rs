@@ -2,10 +2,11 @@ use crate::components::*;
 use crate::constants::*;
 use crate::events::{EntityMoved, Event};
 use crate::resources::{EventQueue, Gameplay};
-use macroquad::{is_key_pressed, KeyCode};
 use specs::world::Index;
 use specs::{Entities, Join, ReadStorage, System, Write, WriteStorage};
 use std::collections::HashMap;
+use macroquad::window::miniquad::KeyCode;
+use macroquad::input::is_key_pressed;
 
 pub struct InputSystem {}
 

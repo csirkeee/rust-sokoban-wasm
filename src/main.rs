@@ -1,4 +1,3 @@
-use macroquad::{get_time, next_frame, load_texture};
 use specs::{RunNow, World, WorldExt};
 
 mod audio;
@@ -17,6 +16,9 @@ use crate::resources::*;
 use crate::systems::*;
 use specs::shred::FetchMut;
 use std::ops::DerefMut;
+use macroquad::time::get_time;
+use macroquad::texture::load_texture;
+use macroquad::window::next_frame;
 
 struct Game {
     world: World,

@@ -1,10 +1,10 @@
 use crate::audio::AudioStore;
 use crate::events::Event;
-use macroquad::{Texture2D};
 use specs::World;
 use std::collections::{HashMap, VecDeque};
 use std::fmt;
 use std::fmt::Display;
+use macroquad::texture::Texture2D;
 
 // Resources
 pub enum GameplayState {
