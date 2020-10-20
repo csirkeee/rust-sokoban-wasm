@@ -60,6 +60,12 @@ impl Game {
             let mut rs = RenderingSystem {};
             rs.run_now(&self.world);
         }
+
+        // Render game entities
+        {
+            let mut aus = AudioSystem {};
+            aus.run_now(&self.world);
+        }
     }
 }
 

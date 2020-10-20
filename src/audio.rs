@@ -1,21 +1,36 @@
 use specs::{World, WorldExt};
 use std::collections::HashMap;
-use quad_snd::mixer::Sound;
+use quad_snd::mixer::{Sound, SoundMixer};
 use macroquad::file::load_file;
 use quad_snd::decoder::read_wav;
+use std::sync::{Arc, Mutex};
 
-#[derive(Default)]
 pub struct AudioStore {
     pub sounds: HashMap<String, Sound>,
+    pub mixer: Arc<Mutex<SoundMixer>>,
+}
+
+impl Default for AudioStore {
+    fn default() -> Self {
+        Self {
+            sounds: HashMap::new(),
+            mixer: Arc::new(Mutex::new(SoundMixer::new())),
+        }
+    }
 }
 
 impl AudioStore {
     pub fn play_sound(&mut self, sound: &String) {
-        // let _ = self
-        //     .sounds
-        //     .get_mut(sound)
-        //     .expect("expected sound")
-        //     .play_detached();
+        self.mixer
+            .lock()
+            .unwrap()
+            .play(self.sounds.get(sound).unwrap().clone());
+    }
+
+    pub fn frame(&mut self) {
+        self.mixer
+            .lock()
+            .unwrap().frame();
     }
 }
 
