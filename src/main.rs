@@ -15,7 +15,6 @@ use crate::map::*;
 use crate::resources::*;
 use crate::systems::*;
 use specs::shred::FetchMut;
-use std::ops::DerefMut;
 use macroquad::time::get_time;
 use macroquad::texture::load_texture;
 use macroquad::window::next_frame;

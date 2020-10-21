@@ -48,7 +48,7 @@ impl<'a> System<'a> for RenderingSystem {
     );
 
     fn run(&mut self, data: Self::SystemData) {
-        let (gameplay, time, mut image_store, positions, renderables) = data;
+        let (gameplay, time, image_store, positions, renderables) = data;
 
         // Clearing the screen (this gives us the backround colour)
         clear_background(Color::new(0.95, 0.95, 0.95, 1.0));

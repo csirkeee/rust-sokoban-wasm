@@ -12,3 +12,6 @@ specs = { version = "0.16.1", features = ["specs-derive"] }
 itertools = "0.9.0"
 futures = "0.3.6"
 quad-snd = { git = "https://github.com/not-fl3/quad-snd" }
+
+[profile.release]
+lto = true
