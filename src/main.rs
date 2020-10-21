@@ -14,10 +14,10 @@ use crate::components::*;
 use crate::map::*;
 use crate::resources::*;
 use crate::systems::*;
-use specs::shred::FetchMut;
-use macroquad::time::get_time;
 use macroquad::texture::load_texture;
+use macroquad::time::get_time;
 use macroquad::window::next_frame;
+use specs::shred::FetchMut;
 
 struct Game {
     world: World,
@@ -75,7 +75,6 @@ async fn load_game_image(mut image_store: FetchMut<'_, ImageStore>, path: &str) 
     }
 }
 
-
 // Initialize the level
 pub async fn initialize_level(world: &mut World) {
     const MAP: &str = "
@@ -90,16 +89,56 @@ pub async fn initialize_level(world: &mut World) {
     W W W W W W W W
     ";
 
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_blue_1.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_blue_2.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_red_1.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_red_2.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_spot_blue.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/box_spot_red.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/floor.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_1.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_2.png").await;
-    load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/player_3.png").await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_blue_1.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_blue_2.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_red_1.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_red_2.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_spot_blue.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/box_spot_red.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/floor.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/player_1.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/player_2.png",
+    )
+    .await;
+    load_game_image(
+        world.fetch_mut::<ImageStore>(),
+        "resources/images/player_3.png",
+    )
+    .await;
     load_game_image(world.fetch_mut::<ImageStore>(), "resources/images/wall.png").await;
 
     load_map(world, MAP.to_string());

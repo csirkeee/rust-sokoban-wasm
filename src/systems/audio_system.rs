@@ -1,5 +1,5 @@
-use specs::{System, Write};
 use crate::audio::AudioStore;
+use specs::{System, Write};
 
 pub struct AudioSystem {}
 

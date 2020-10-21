@@ -6,7 +6,9 @@ pub fn create_wall(world: &mut World, position: Position) {
     world
         .create_entity()
         .with(Position { z: 10, ..position })
-        .with(Renderable::new_static("resources/images/wall.png".to_string()))
+        .with(Renderable::new_static(
+            "resources/images/wall.png".to_string(),
+        ))
         .with(Wall {})
         .with(Immovable)
         .build();
@@ -16,7 +18,9 @@ pub fn create_floor(world: &mut World, position: Position) {
     world
         .create_entity()
         .with(Position { z: 5, ..position })
-        .with(Renderable::new_static("resources/images/floor.png".to_string()))
+        .with(Renderable::new_static(
+            "resources/images/floor.png".to_string(),
+        ))
         .build();
 }
 

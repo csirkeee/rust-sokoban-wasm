@@ -2,11 +2,11 @@ use crate::components::*;
 use crate::constants::*;
 use crate::events::{EntityMoved, Event};
 use crate::resources::{EventQueue, Gameplay};
+use macroquad::input::is_key_pressed;
+use macroquad::window::miniquad::KeyCode;
 use specs::world::Index;
 use specs::{Entities, Join, ReadStorage, System, Write, WriteStorage};
 use std::collections::HashMap;
-use macroquad::window::miniquad::KeyCode;
-use macroquad::input::is_key_pressed;
 
 pub struct InputSystem {}
 
@@ -26,8 +26,6 @@ impl<'a> System<'a> for InputSystem {
     type SystemData = InputSystemData<'a>;
 
     fn run(&mut self, mut data: Self::SystemData) {
-
-
         for &key in [KeyCode::Up, KeyCode::Down, KeyCode::Left, KeyCode::Right].iter() {
             if is_key_pressed(key) {
                 self.handle_button_press(&mut data, key)
@@ -40,15 +38,7 @@ impl InputSystem {
     fn handle_button_press(&mut self, data: &mut InputSystemData, key: KeyCode) {
         println!("Key pressed: {:?}", key);
 
-        let (
-            events,
-            gameplay,
-            entities,
-            positions,
-            players,
-            movables,
-            immovables,
-        ) = data;
+        let (events, gameplay, entities, positions, players, movables, immovables) = data;
 
         let mut to_move = Vec::new();
 

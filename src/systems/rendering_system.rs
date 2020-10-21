@@ -2,12 +2,12 @@ use crate::components::*;
 use crate::constants::TILE_WIDTH;
 use crate::resources::*;
 use itertools::Itertools;
-use specs::{Join, Read, ReadStorage, System, Write};
-use std::{collections::HashMap};
+use macroquad::prelude::{Color, BLACK, WHITE};
 use macroquad::text::draw_text;
-use macroquad::window::clear_background;
-use macroquad::prelude::{Color, WHITE, BLACK};
 use macroquad::texture::draw_texture;
+use macroquad::window::clear_background;
+use specs::{Join, Read, ReadStorage, System, Write};
+use std::collections::HashMap;
 
 pub struct RenderingSystem {}
 

@@ -1,8 +1,8 @@
-use specs::{World, WorldExt};
-use std::collections::HashMap;
-use quad_snd::mixer::{Sound, SoundMixer};
 use macroquad::file::load_file;
 use quad_snd::decoder::read_wav;
+use quad_snd::mixer::{Sound, SoundMixer};
+use specs::{World, WorldExt};
+use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 pub struct AudioStore {
@@ -28,9 +28,7 @@ impl AudioStore {
     }
 
     pub fn frame(&mut self) {
-        self.mixer
-            .lock()
-            .unwrap().frame();
+        self.mixer.lock().unwrap().frame();
     }
 }
 
@@ -43,6 +41,8 @@ pub async fn initialize_sounds(world: &mut World) {
         let sound_path = format!("resources/sounds/{}.wav", sound_name);
         let sound_bytes = load_file(&sound_path).await.unwrap();
 
-        audio_store.sounds.insert(sound_name, read_wav(&sound_bytes[..]).unwrap());
+        audio_store
+            .sounds
+            .insert(sound_name, read_wav(&sound_bytes[..]).unwrap());
     }
 }
